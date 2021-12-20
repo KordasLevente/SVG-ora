@@ -1,16 +1,21 @@
 from coord import Coord
 from drawsvg import DrawSVG
-from datetime import datetime
 import time
+import ntplib
+from time import ctime
+
+#NTP szerver
+c= ntplib.NTPClient()
+response = c.request('0.hu.pool.ntp.org', version=3)
+
 
 height = 600
 width = 600
 r = 100
 
-
 def drawClock(timeToDisplay):
    d = DrawSVG("clock.html", height, width)
-   time = timeToDisplay.strftime("%H:%M:%S")
+   time = ctime(response.tx_time).split(' ')[3]
    #óralap
    d.circle(d.center, r, "black", "white")
 
@@ -46,5 +51,6 @@ def drawClock(timeToDisplay):
    d.close()
 
 while True:
-   drawClock(datetime.now())
+   response = c.request('europe.pool.ntp.org', version=3)
+   drawClock(ctime(response.tx_time).split(' ')[3])
    time.sleep(1)
